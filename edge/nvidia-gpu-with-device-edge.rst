@@ -19,7 +19,7 @@ Accelerating workloads with NVIDIA GPUs with Red Hat Device Edge
 Introduction
 **************
 
-`Red Hat Device Edge <https://docs.redhat.com/en/documentation/red_hat_device_edge/4/html/overview/device-edge-overview>`_ combines lightweight Kubernetes using `MicroShift <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest>`_ with Red Hat Enterprise Linux at the edge. 
+`Red Hat Device Edge <https://docs.redhat.com/en/documentation/red_hat_device_edge/4/html/overview/device-edge-overview>`_ combines lightweight Kubernetes (MicroShift) with an enterprise-grade Linux OS to accelerate AI/ML workloads and simplify fleet management at the edge. 
 
 MicroShift is a Kubernetes implementation derived from OpenShift, focusing on a minimal footprint for single-node deployments in resource-constrained locations. MicroShift became generally available (GA) with `release 4.14 <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.14/html/release_notes/microshift-4-14-release-notes#microshift-4-14-about-this-release>`_, and at the time of this writing, the current release is `4.20 <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/red_hat_build_of_microshift_release_notes/red-hat-build-of-microshift-4.20-release-notes>`_. This platform enables you to deploy bare metal, virtual, containerized, or Kubernetes workloads to edge environments, with support for streamlined over-the-air updates for managed RHEL devices in hard-to-service locations.
 
@@ -29,12 +29,12 @@ This guide provides procedures to enable workloads to use NVIDIA GPUs on an x86 
    This documentation supports NVIDIA GPU enablement on Red Hat Device Edge deployments using:
    
    * `RPM-based installations <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/installing_with_an_rpm_package/index>`_: Standard RHEL installations using RPM packages
-   * `Image Mode <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/installing_with_image_mode_for_rhel/index>`_: Container-native bootable image deployments using RHEL Image Mode (based on the `bootc <https://docs.fedoraproject.org/en-US/bootc/getting-started/>`_ upstream project)
+   * `Image Mode <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/installing_with_image_mode_for_rhel/understanding-image-mode-for-rhel>`_: Container-native bootable image deployments using `RHEL Image Mode <https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/using_image_mode_for_rhel_to_build_deploy_and_manage_operating_systems/index>`_ (based on the `bootc <https://docs.fedoraproject.org/en-US/bootc/getting-started/>`_ upstream project)
    * `RHEL for Edge <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/embedding_in_a_rhel_for_edge_image/index>`_: Image Builder-based immutable OS deployments (based on rpm-ostree)
    
    The procedures are applicable across these deployment methods, with specific considerations noted where differences exist.
 
-**Document Overview**
+**Document overview**
 
 This guide is organized into the following sections:
 
@@ -49,7 +49,7 @@ This guide is organized into the following sections:
 Use the table of contents above to navigate directly to specific sections.
 
 **************************
-Architecture Overview
+Architecture overview
 **************************
 
 The NVIDIA GPU integration with Red Hat Device Edge consists of multiple layers working together to expose GPU resources to containerized workloads running in MicroShift.
@@ -72,7 +72,7 @@ The component stack flows from hardware to application:
 * **Application Layer**: GPU-accelerated Kubernetes pods requesting ``nvidia.com/gpu`` resources
 
 **********************************
-Deployment Method Comparison
+Deployment method comparison
 **********************************
 
 This guide supports three deployment methodologies. Use the following comparison to select the appropriate method for your environment.
@@ -107,12 +107,12 @@ This guide supports three deployment methodologies. Use the following comparison
      - Modern edge deployments, CI/CD pipelines, container-native workflows, cloud-native edge computing. systems requiring atomic rollback, fleet management
 
 ******************
-Bill of Materials
+Bill of materials
 ******************
 
 This section provides the validated software version combinations for this guide.
 
-**Supported RHEL and MicroShift Combinations**
+**Supported RHEL and MicroShift combinations**
 
 .. list-table:: Supported RHEL and MicroShift Combinations
    :header-rows: 1
@@ -131,7 +131,7 @@ This section provides the validated software version combinations for this guide
      - 4.15 (EOL), 4.14 (EUS 2 only)
      - EUS release. MicroShift 4.15 is End of Life. MicroShift 4.14 is only supported under Extended Update Support Term 2 (EUS 2)
 
-**NVIDIA Component Versions**
+**NVIDIA component versions**
 
 .. list-table:: NVIDIA Component Versions
    :header-rows: 1
@@ -161,7 +161,7 @@ Prerequisites
 
 **In this section**: This section covers prerequisites common to all deployment methods, including repository access, GPU verification, and version locking requirements. Method-specific prerequisites are detailed at the end.
 
-**Common Prerequisites**
+**Common prerequisites**
 
 * Install MicroShift on your Red Hat Enterprise Linux 9.x machine or build a new System Image (rpm-ostree or bootc) using one of the supported methods:
   
@@ -193,11 +193,11 @@ Prerequisites
    
    See the deployment-method-specific prerequisites section below for detailed instructions.
 
-**Deployment-Method-Specific Prerequisites**
+**Deployment-method-specific prerequisites**
 
 All deployment methods require the same base repositories and GPU verification, but differ in where and how these prerequisites are met:
 
-**Common Prerequisites (All Methods)**
+**Common prerequisites (all methods)**
 
 * **Repository Access**: All methods require access to the following Red Hat repositories:
   
@@ -237,9 +237,9 @@ All deployment methods require the same base repositories and GPU verification, 
      * Check current release setting with ``subscription-manager release --show``
      * For detailed information about setting the release, see `How to tie/untie a system to a specific update of Red Hat Enterprise Linux <https://access.redhat.com/solutions/238533>`_
 
-**Method-Specific Requirements**
+**Method-specific requirements**
 
-**For RPM-Based Installations**
+**For RPM-based installations**
 
 * Set the **target system** to a specific RHEL minor release before installing packages to prevent unintended upgrades:
 
@@ -250,7 +250,7 @@ All deployment methods require the same base repositories and GPU verification, 
   .. note::
      It is recommended to set the release before installing packages to avoid dependency issues.
 
-**For RHEL for Edge (rpm-ostree) and Image Mode (bootc) Installations**
+**For RHEL for Edge (rpm-ostree) and Image Mode (bootc) installations**
 
 Both immutable deployment methods share the same build system requirements. The same Image Builder VM or container build system can be used to build both RHEL for Edge and Image Mode images, allowing you to maintain multiple deployment branches from a single build environment.
 
@@ -266,20 +266,19 @@ Both immutable deployment methods share the same build system requirements. The 
   .. note::
      * The build system requires repository access to pull or install MicroShift, NVIDIA driver packages, and other dependencies during image composition. The target edge device does not need direct repository access, as all required packages are included in the composed image.
      * **EUS Repository Configuration**: If you are using an Extended Update Support (EUS) release of MicroShift or RHEL, you must configure Image Builder to use EUS repositories. This involves modifying the repository configuration files in `/etc/osbuild-composer/repositories/` to point to EUS repository URLs. For detailed procedures on enabling EUS repositories for Image Builder, see `Enabling extended support repositories for image building <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/embedding_in_a_rhel_for_edge_image/embedding-microshift-in-a-rhel-for-edge-image_embedding-in-a-rhel-for-edge-image#enabling-extended-support-repositories-for-image-building_embedding-microshift-in-a-rhel-for-edge-image>`_ in the MicroShift documentation.
-     * **Unified Build Environment**: You can use the same Image Builder VM to build both RHEL for Edge blueprints and Image Mode container images, allowing you to maintain consistent versions across both deployment methods from a single build system.
 
 
 .. _installation-procedures:
 
 ********************************
-Installation Procedures
+Installation procedures
 ********************************
 
 **In this section**: Each deployment method includes complete installation steps for the NVIDIA GPU driver, Container Toolkit, and Device Plugin. For RPM-based installations, components are installed sequentially on a running system. For RHEL for Edge and Image Mode, all components are embedded in the image during build.
 
 This guide provides installation procedures for enabling NVIDIA GPU support on Red Hat Device Edge. The procedures differ depending on your deployment method:
 
-**Quick Navigation:**
+**Quick navigation:**
 
 * :ref:`rpm-based-installation` - For standard RPM-based RHEL installations (sequential installation of driver, container toolkit, and device plugin)
 * :ref:`rhel-for-edge-installation` - For RHEL for Edge immutable deployments (embedding all components in the image)
@@ -287,20 +286,17 @@ This guide provides installation procedures for enabling NVIDIA GPU support on R
 
 Choose the appropriate section based on your deployment method.
 
-.. note::
-   **In this section**: Each deployment method includes complete installation steps for the NVIDIA GPU driver, Container Toolkit, and Device Plugin. For RPM-based installations, components are installed sequentially on a running system. For RHEL for Edge and Image Mode, all components are embedded in the image during build.
-
 .. _rpm-based-installation:
 
 ********************************
-RPM-Based Installation
+Installing via RPM packages
 ********************************
 
 **In this section**: This section provides sequential installation steps for the NVIDIA GPU driver (Step 1), Container Toolkit (Step 2), and Device Plugin (Step 3) on a running RPM-based RHEL system. Each step includes verification procedures.
 
 For standard RHEL installations using RPM packages, install the NVIDIA GPU driver, Container Toolkit, and Device Plugin sequentially on a running system. This procedure applies to new systems with NVIDIA GPUs.
 
-**About NVIDIA Drivers**
+**About NVIDIA drivers**
 
 NVIDIA provides precompiled drivers in RPM repositories that implement the modularity mechanism. This approach is recommended for production deployments as it avoids the need for compiler toolchains and `Extra Packages for Enterprise Linux (EPEL) <https://access.redhat.com/solutions/3358>`_ dependencies.
 
@@ -316,11 +312,11 @@ For more information about modularity streams and driver deployment, see `Stream
 .. important::
    Use a supported Production Branch driver version. As of this writing, R580 is the current stable Production Branch. Previous branches such as R575, R565, R560, R550, and R525 are End-of-Life (EOL) and should not be used in production. For the latest supported driver versions, refer to `NVIDIA Datacenter Drivers documentation <https://docs.nvidia.com/datacenter/tesla/drivers/supported-drivers-and-cuda-toolkit-versions.html>`_.
 
-**Step 1: Installing the NVIDIA GPU Driver**
+**Step 1: Installing the NVIDIA GPU driver**
 
 This procedure applies to standard RHEL installations using RPM packages on a new system with an NVIDIA GPU.
 
-**Choosing a Driver Type**
+**Choosing a driver type**
 
 For production deployments, use the standard NVIDIA-signed pre-compiled driver. The open GPU driver is available as a tech preview option for testing only:
 
@@ -864,18 +860,31 @@ The static manifest method deploys the device plugin using YAML files placed in 
 .. _image-mode-installation:
 
 ********************************
-Image Mode Installation
+Installing with image mode
 ********************************
 
-**In this section**: This section provides complete Containerfile examples that embed all NVIDIA components (driver, Container Toolkit, and Device Plugin) in a bootc container image. Includes build workflow diagrams and instructions for using `bootc-image-builder` to create bootable disk images in multiple formats (QCOW2, VMDK, AMI, ISO, raw).
+**In this section**: This section details how to create a bootc container image that embeds all necessary NVIDIA components—including the driver, Container Toolkit, and Device Plugin. By including these components in the image definition, you ensure a consistent, atomic deployment across your fleet.
 
-For RHEL Image Mode deployments, all NVIDIA components (GPU driver, Container Toolkit, and Device Plugin) should be included in your container image definition. RHEL Image Mode uses `bootc-image-builder <https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/using_image_mode_for_rhel_to_build_deploy_and_manage_operating_systems/creating-bootc-compatible-base-disk-images-with-bootc-image-builder_using-image-mode-for-rhel-to-build-deploy-and-manage-operating-systems>`_ to create bootable disk images from container images. The `bootc-image-builder` tool supports multiple target formats including QCOW2 (for KVM/QEMU), VMDK (for VMware), GCE images (for Google Cloud), AMI images (for AWS), VHD images (for Azure/HyperV), raw disk images, and ISO images for bare metal installations.
+**Understanding the build process**
 
-This procedure creates a bootc container image that includes complete NVIDIA GPU support, which can then be converted to a bootable disk image using `bootc-image-builder` for deployment to new devices. RHEL Image Mode is based on the `bootc <https://docs.fedoraproject.org/en-US/bootc/getting-started/>`_ upstream project.
+For `RHEL Image Mode <https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/using_image_mode_for_rhel_to_build_deploy_and_manage_operating_systems/index>`_ deployments, the build process is divided into two distinct phases. This approach leverages the upstream `bootc <https://docs.fedoraproject.org/en-US/bootc/getting-started/>`_ project to manage the operating system as a container.
 
-**Image Mode Build Workflow**
+1. **Build the container image**: Use `podman build` to generate a container image from your Containerfile. This image acts as the source of truth and must include:
 
-The following workflow illustrates the complete process for building and deploying an Image Mode container image with NVIDIA GPU support:
+   * MicroShift (if required)
+   * NVIDIA drivers
+   * NVIDIA Container Toolkit
+   * Device Plugin manifests
+
+2. **Create the bootable disk image**: Once the container image is built, use the `bootc-image-builder` tool to convert it into a bootable disk image. This tool supports various target formats for different environments:
+
+   * **Virtualization**: QCOW2 (KVM/QEMU), VMDK (VMware), VHD (Azure/Hyper-V)
+   * **Cloud**: AMI (AWS), GCE (Google Cloud)
+   * **Bare Metal**: Raw disk images, ISO
+
+**Image Mode build workflow**
+
+The following diagram and steps illustrate the end-to-end pipeline for building and deploying an image mode container with full NVIDIA GPU support:
 
 .. figure:: graphics/redhat-device-edge/rhim-workflow.png
    :alt: Red Hat Device Edge Image Mode Workflow
@@ -886,14 +895,9 @@ The following workflow illustrates the complete process for building and deployi
    For complete documentation on RHEL Image Mode and MicroShift, see `Installing MicroShift with image mode for RHEL <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/installing_with_image_mode_for_rhel/index>`_. For detailed information about `bootc-image-builder` and supported image formats, see `Creating bootc-compatible base disk images by using bootc-image-builder <https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/using_image_mode_for_rhel_to_build_deploy_and_manage_operating_systems/creating-bootc-compatible-base-disk-images-with-bootc-image-builder_using-image-mode-for-rhel-to-build-deploy-and-manage-operating-systems>`_.
 
 .. note::
-   **Base Image Selection**: The Containerfile examples use ``registry.redhat.io/rhel9-eus/rhel-9.6-bootc:9.6`` for EUS releases. For standard (non-EUS) RHEL releases, use ``registry.redhat.io/rhel9/rhel-bootc:9.6`` instead. Choose the base image that matches your RHEL release type:
-   
-   * **EUS releases**: Use ``registry.redhat.io/rhel9-eus/rhel-<major.minor>-bootc:<major.minor>`` (e.g., ``rhel9-eus/rhel-9.6-bootc:9.6``)
-   * **Standard releases**: Use ``registry.redhat.io/rhel9/rhel-bootc:<major.minor>`` (e.g., ``rhel9/rhel-bootc:9.6``)
-   
-   Ensure the base image version matches your target RHEL minor release and MicroShift compatibility requirements.
+   **Base Image Selection**: The Containerfile examples use ``registry.redhat.io/rhel9-eus/rhel-9.6-bootc:9.6`` for EUS releases. For standard (non-EUS) RHEL releases, use ``registry.redhat.io/rhel9/rhel-bootc:9.6`` instead. Ensure the base image version matches your target RHEL minor release and MicroShift compatibility requirements.
 
-**Creating a Complete Container Image with All NVIDIA Components**
+**Creating a complete container image with all NVIDIA components**
 
 When creating your bootc container image, include MicroShift, NVIDIA drivers, Container Toolkit, and Device Plugin manifests in a single Containerfile. This ensures all components are part of the immutable base image and will be available when the image is deployed to new devices.
 
@@ -929,7 +933,7 @@ When creating your bootc container image, include MicroShift, NVIDIA drivers, Co
       # Install MicroShift and required packages
       # Note: MicroShift and NVIDIA repositories are configured on the build host
       # and made available via volume mounts during the build process
-      RUN dnf install -y firewalld jq microshift microshift-release-info cockpit openscap-utils scap-security-guide && \
+      RUN dnf install -y firewalld jq microshift microshift-release-info cockpit openscap-utils scap-security-guide pciutils && \
           systemctl enable microshift
       
       # Install NVIDIA driver (standard pre-compiled driver)
@@ -1027,7 +1031,7 @@ When creating your bootc container image, include MicroShift, NVIDIA drivers, Co
       # Install MicroShift and required packages
       # Note: MicroShift and NVIDIA repositories are configured on the build host
       # and made available via volume mounts during the build process
-      RUN dnf install -y firewalld jq microshift microshift-release-info cockpit openscap-utils scap-security-guide && \
+      RUN dnf install -y firewalld jq microshift microshift-release-info cockpit openscap-utils scap-security-guide pciutils && \
           systemctl enable microshift
       
       # Install NVIDIA open GPU driver (tech preview - testing only)
@@ -1108,7 +1112,7 @@ When creating your bootc container image, include MicroShift, NVIDIA drivers, Co
       # Clean up
       RUN dnf clean all
 
-   **Alternative: Using Helm Charts for Device Plugin**
+   **Alternative: Using Helm charts for Device Plugin**
 
    If you prefer to use Helm charts instead of static manifests, you can install Helm and deploy the device plugin using Helm in the Containerfile:
 
@@ -1122,7 +1126,7 @@ When creating your bootc container image, include MicroShift, NVIDIA drivers, Co
       # Install MicroShift and required packages
       # Note: MicroShift and NVIDIA repositories are configured on the build host
       # and made available via volume mounts during the build process
-      RUN dnf install -y firewalld jq microshift microshift-release-info cockpit openscap-utils scap-security-guide && \
+      RUN dnf install -y firewalld jq microshift microshift-release-info cockpit openscap-utils scap-security-guide pciutils && \
           systemctl enable microshift
       
       # Install Helm (not available in RHEL repositories, must be installed manually)
@@ -1239,6 +1243,9 @@ When creating your bootc container image, include MicroShift, NVIDIA drivers, Co
 
 #. Build your container image. For builds that require Red Hat subscription access, use volume mounts to provide repository and entitlement access:
 
+   .. note::
+      **Pull Secret Configuration**: For connected deployments where the container images are pulled from a remote registry, you must configure the MicroShift pull secrets `/etc/crio/openshift-pull-secret` to authenticate with the registry. Pull secrets can be configured during installation via Kickstart (see `Creating the Kickstart file <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/installing_with_image_mode_for_rhel/running-the-bootc-image-in-a-virtual-machine#microshift-install-bootc-prepare-kickstart_microshift-install-running-bootc-image-in-vm>`_), Ignition, or embedded in the image. For disconnected deployments using fully self-contained bootc images, pull secrets are not required as all container images are embedded in the bootc image (see `Creating a fully self-contained bootc image <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/installing_with_image_mode_for_rhel/creating-a-fully-self-contained-bootc-image>`_).
+
    .. code-block:: console
 
       $ podman build -t my-rhel-bootc-image:latest \
@@ -1277,7 +1284,11 @@ When creating your bootc container image, include MicroShift, NVIDIA drivers, Co
 
    .. code-block:: console
 
-      $ podman build -t my-rhel-bootc-image:kubevirt -f Containerfile.kubevirt
+      $ podman build -t my-rhel-bootc-image:kubevirt \
+          --volume /etc/rhsm:/etc/rhsm:ro,z \
+          --volume /etc/pki/entitlement:/etc/pki/entitlement:ro,z \
+          --volume /etc/yum.repos.d:/etc/yum.repos.d:ro,z \
+          -f Containerfile.kubevirt
 
    Then create the QCOW2 disk image:
 
@@ -1315,7 +1326,11 @@ When creating your bootc container image, include MicroShift, NVIDIA drivers, Co
 
    .. code-block:: console
 
-      $ podman build -t my-rhel-bootc-image:vmware -f Containerfile.vmware
+      $ podman build -t my-rhel-bootc-image:vmware \
+          --volume /etc/rhsm:/etc/rhsm:ro,z \
+          --volume /etc/pki/entitlement:/etc/pki/entitlement:ro,z \
+          --volume /etc/yum.repos.d:/etc/yum.repos.d:ro,z \
+          -f Containerfile.vmware
 
    Then create the VMDK disk image:
 
@@ -1374,7 +1389,11 @@ When creating your bootc container image, include MicroShift, NVIDIA drivers, Co
 
    .. code-block:: console
 
-      $ podman build -t my-rhel-bootc-image:azure -f Containerfile.azure
+      $ podman build -t my-rhel-bootc-image:azure \
+          --volume /etc/rhsm:/etc/rhsm:ro,z \
+          --volume /etc/pki/entitlement:/etc/pki/entitlement:ro,z \
+          --volume /etc/yum.repos.d:/etc/yum.repos.d:ro,z \
+          -f Containerfile.azure
 
    Then create the VHD disk image:
 
@@ -1423,15 +1442,31 @@ When creating your bootc container image, include MicroShift, NVIDIA drivers, Co
 
 #. Deploy the bootable disk image to your target system using the appropriate method for your image type (QCOW2, VMDK, AMI, VHD, ISO, or raw disk). For detailed installation procedures, see `Installing MicroShift with image mode for RHEL <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/installing_with_image_mode_for_rhel/index>`_ and `Deploying RHEL bootc images <https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/using_image_mode_for_rhel_to_build_deploy_and_manage_operating_systems/deploying-rhel-bootc-images_using-image-mode-for-rhel-to-build-deploy-and-manage-operating-systems>`_.
 
-**Alternative: Installing Helm Charts on a Running Image Mode System**
+**Alternative: Installing Helm charts on a running Image Mode system**
 
 If you built your image with static manifests but want to switch to Helm charts, or if you need to install Helm charts on a running system, you can do so after deployment:
 
-#. Install Helm on the running system:
+#. Install Helm on the running system by downloading the binary. On bootc systems, `/usr` is read-only, so install Helm to `/var`:
 
    .. code-block:: console
 
-      $ dnf install -y helm
+      $ HELM_VERSION="v3.15.0"
+      $ curl -LO "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
+      $ tar -zxvf "helm-${HELM_VERSION}-linux-amd64.tar.gz"
+      $ sudo mkdir -p /var/local/bin
+      $ sudo mv linux-amd64/helm /var/local/bin/helm
+      $ sudo chmod +x /var/local/bin/helm
+      $ rm -rf linux-amd64 "helm-${HELM_VERSION}-linux-amd64.tar.gz"
+      $ export PATH="/var/local/bin:$PATH"
+
+   Verify the installation:
+
+   .. code-block:: console
+
+      $ helm version
+
+   .. note::
+      On bootc systems, the root filesystem is read-only. Helm must be installed to a writable location such as `/var/local/bin`. Add `/var/local/bin` to your PATH in your shell profile (e.g., `~/.bashrc`) to make Helm available in future sessions.
 
 #. Add the NVIDIA Device Plugin Helm repository:
 
@@ -1582,95 +1617,106 @@ If you built your image with static manifests but want to switch to Helm charts,
 .. _rhel-for-edge-installation:
 
 ********************************
-RHEL for Edge Installation
+Installing with RHEL for Edge
 ********************************
 
-**In this section**: This section provides blueprint examples and Ignition configurations that embed all NVIDIA components (driver, Container Toolkit, and Device Plugin) in a RHEL for Edge image. Includes build workflow diagrams, complete blueprint samples with MicroShift requirements, and options for Helm chart deployment via Ignition.
+**In this section**: This section provides a streamlined workflow for embedding all NVIDIA components (driver, Container Toolkit, and Device Plugin) in a RHEL for Edge image. The process is organized into clear phases: repository setup, blueprint creation, image build, and verification.
 
 For RHEL for Edge immutable deployments, all NVIDIA components (GPU driver, Container Toolkit, and Device Plugin) must be embedded in the image blueprint during image composition. This procedure creates a RHEL for Edge image that includes complete NVIDIA GPU support for deployment to new devices. RHEL for Edge is based on the `rpm-ostree <https://coreos.github.io/rpm-ostree/>`_ upstream project, which provides atomic, image-based updates.
 
-**RHEL for Edge Build Workflow**
+**Workflow Overview**
+
+The RHEL for Edge build process follows these phases:
+
+1. **Phase 1: Prerequisites and Repository Setup** - Configure Image Builder with required repositories
+2. **Phase 2: Blueprint Creation** - Define packages, files, and customizations
+3. **Phase 3: Runtime Configuration** - Create configuration for Container Toolkit and Device Plugin
+4. **Phase 4: Build and Deploy** - Create OSTree commit and deployable images
+5. **Phase 5: Verification** - Confirm all components are embedded and functional
+
+**RHEL for Edge build workflow**
 
 The following workflow illustrates the complete process for building and deploying a RHEL for Edge image with NVIDIA GPU support:
 
-::
+.. figure:: graphics/redhat-device-edge/rhel4edge-workflow.png
+   :alt: RHEL for Edge Workflow
+   :align: center
+   :width: 80%
 
-   ┌─────────────────────┐
-   │  Step 1: Create     │
-   │  Blueprint (TOML)   │
-   │  • Define packages  │
-   │  • Configure        │
-   │    customizations   │
-   │  • Reference        │
-   │    Ignition config  │
-   └──────────┬──────────┘
-              │
-              ▼
-   ┌─────────────────────┐
-   │  Step 2: Add        │
-   │  Repository Sources │
-   │  to Image Builder   │
-   │  • NVIDIA CUDA repo │
-   │  • Container Toolkit│
-   │    repo             │
-   │  • MicroShift repos │
-   └──────────┬──────────┘
-              │
-              ▼
-   ┌─────────────────────┐
-   │  Step 3: Create     │
-   │  OSTree Commit       │
-   │  composer-cli       │
-   │  compose start       │
-   │  <blueprint>         │
-   │  edge-commit         │
-   └──────────┬──────────┘
-              │
-              ▼
-   ┌─────────────────────┐
-   │  Step 4: Export     │
-   │  OSTree Repository  │
-   │  • Extract commit   │
-   │  • Generate summary │
-   │  • Host via HTTP    │
-   └──────────┬──────────┘
-              │
-              ▼
-   ┌─────────────────────┐
-   │  Step 5: Build Final│
-   │  Image              │
-   │  • edge-raw-image   │
-   │  • edge-installer   │
-   │  • edge-container   │
-   └──────────┬──────────┘
-              │
-              ▼
-   ┌─────────────────────┐
-   │  Step 6: Deploy to  │
-   │  Edge Device        │
-   │  • Network-based    │
-   │  • Non-network      │
-   │  • Container-based   │
-   └─────────────────────┘
 
 .. important::
    For RHEL for Edge systems, refer to `Red Hat Knowledgebase: NVIDIA drivers and RHEL for Edge (rpm-ostree) systems <https://access.redhat.com/solutions/7059298>`_ for detailed procedures and considerations. The official Red Hat documentation for MicroShift on RHEL for Edge systems (`Updating RPMs on a RHEL for Edge system <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/updating/microshift-update-rpms-ostree>`_) documents the blueprint-based image composition approach, which maintains system immutability and ensures consistent deployments across your edge fleet.
+   
+   For information on creating fully self-contained OS images that include Kubernetes workloads (including container images and manifests), see `How to create a fully self-contained OS image that includes your Kubernetes workload <https://www.redhat.com/en/blog/how-to-create-a-fully-self-contained-os-image-that-includes-your-kubernetes-workload>`_.
 
    .. note::
       **Important**: RHEL for Edge blueprints do not support DNF modularity (modules). You must specify NVIDIA driver packages directly by package name and version, not by module streams.
 
-**Creating the Image Blueprint with All NVIDIA Components**
+**Configuration Method Selection**
 
-When composing your RHEL for Edge image with Image Builder, include the NVIDIA driver packages, Container Toolkit, and Device Plugin manifests in your blueprint. This ensures all components are part of the immutable base image and will be available when the image is deployed to new devices.
+For RHEL for Edge deployments, use the following approach:
 
-**Step 1: Adding NVIDIA Driver Packages**
+* **Driver packages**: Always in blueprint (required)
+* **Nouveau blacklist**: Use blueprint file customization (recommended) - see blueprint example below
+* **Container Toolkit configuration**: Use configuration file (required for runtime setup)
+* **Device Plugin**: Use Helm charts via configuration file (recommended for production) or static manifests (alternative)
 
-#. Create Image Builder configuration files for adding the NVIDIA CUDA repository sources required to pull NVIDIA driver RPMs:
+**Alternative Approaches:**
 
-   For the standard CUDA repository (NVIDIA-signed drivers):
+* **Nouveau blacklist via kernel parameters**: Use ``[customizations.kernel]`` in blueprint if you prefer kernel-level blacklisting
+* **Nouveau blacklist via Ignition**: Use if you need dynamic configuration or complex multi-file setups
+* **Device Plugin via static manifests**: Use if you don't need Helm's advanced features like time-slicing
+
+For most deployments, the recommended approach (blueprint files + configuration file with Helm) provides the best balance of simplicity and flexibility.
+
+**Quick Reference: Configuration Methods**
+
+.. list-table:: Configuration Options
+   :header-rows: 1
+   :widths: 25 20 20 35
+
+   * - Component
+     - Blueprint
+     - Ignition
+     - Recommendation
+   * - Driver packages
+     - ✅ Required
+     - ❌
+     - Always include in blueprint
+   * - Nouveau blacklist
+     - ✅ Recommended
+     - ⚠️ Alternative
+     - Use blueprint file customization (simplest)
+   * - Container Toolkit config
+     - ⚠️ Limited
+     - ✅ Required
+     - Use configuration file (runtime configuration needed)
+   * - Device Plugin (Helm)
+     - ❌
+     - ✅ Recommended
+     - Use configuration file with Helm scripts (production)
+   * - Device Plugin (Static)
+     - ⚠️ Via RPM (optional)
+     - ✅ Alternative
+     - Use configuration file with static manifests (simpler)
+
+**Phase 1: Prerequisites and Repository Setup**
+
+**Prerequisites**
+
+Before starting, ensure:
+
+* Image Builder VM is set to the target RHEL minor release (e.g., RHEL 9.6 for MicroShift 4.20)
+* Image Builder has access to Red Hat subscription repositories
+* You have root access to the Image Builder VM
+
+**Step 1.1: Add NVIDIA Repositories to Image Builder**
+
+Create repository configuration files and add them to Image Builder:
 
    .. code-block:: console
 
+      # Create NVIDIA CUDA repository configuration
       $ cat > nvidia-cuda.toml <<EOF
       id = "nvidia-cuda"
       name = "NVIDIA CUDA Repository"
@@ -1682,7 +1728,23 @@ When composing your RHEL for Edge image with Image Builder, include the NVIDIA d
       rhsm = false
       EOF
 
-   (Optional) For open GPU drivers (tech preview), also create a preview repository configuration:
+      # Create NVIDIA Container Toolkit repository configuration
+      $ cat > nvidia-container-toolkit.toml <<EOF
+      id = "nvidia-container-toolkit"
+      name = "NVIDIA Container Toolkit Repository"
+      type = "yum-baseurl"
+      url = "https://nvidia.github.io/libnvidia-container/stable/rpm/x86_64"
+      check_gpg = true
+      check_ssl = true
+      system = false
+      rhsm = false
+      EOF
+
+      # Add repositories to Image Builder
+      $ sudo composer-cli sources add nvidia-cuda.toml
+      $ sudo composer-cli sources add nvidia-container-toolkit.toml
+
+   (Optional) For open GPU drivers (tech preview), also create and add the preview repository:
 
    .. code-block:: console
 
@@ -1696,89 +1758,16 @@ When composing your RHEL for Edge image with Image Builder, include the NVIDIA d
       system = false
       rhsm = false
       EOF
-
-#. Create an Image Builder configuration file for adding the NVIDIA Container Toolkit repository:
-
-   .. code-block:: console
-
-      $ cat > nvidia-container-toolkit.toml <<EOF
-      id = "nvidia-container-toolkit"
-      name = "NVIDIA Container Toolkit Repository"
-      type = "yum-baseurl"
-      url = "https://nvidia.github.io/libnvidia-container/stable/rpm/x86_64"
-      check_gpg = true
-      check_ssl = true
-      system = false
-      rhsm = false
-      EOF
-
-#. Add the repository sources to Image Builder:
-
-   .. code-block:: console
-
-      $ sudo composer-cli sources add nvidia-cuda.toml
-      $ sudo composer-cli sources add nvidia-container-toolkit.toml
-
-   If using open GPU drivers, also add the preview repository:
-
-   .. code-block:: console
-
       $ sudo composer-cli sources add nvidia-cuda-preview.toml
 
    .. note::
       Repositories are added to Image Builder using `composer-cli sources add`, not directly in the blueprint file. This workflow matches the procedure documented in `Updating RPMs on a RHEL for Edge system <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/updating/microshift-update-rpms-ostree>`_. The preview repository is currently required for open GPU drivers.
 
-#. Create or update your blueprint file (in TOML format) and add the NVIDIA driver packages. Since blueprints do not support modules, you must specify packages directly:
+**Phase 2: Blueprint Creation**
 
-   For driver version R580 (current Production Branch):
+**Step 2.1: Create Comprehensive Blueprint**
 
-   .. code-block:: toml
-
-      name = "rhel-9-edge-nvidia"
-      description = "RHEL for Edge image with MicroShift and NVIDIA GPU support"
-      version = "0.0.1"
-      modules = []
-      groups = []
-      distro = "rhel-94"
-
-      [[packages]]
-      name = "nvidia-driver"
-      version = "580.*"
-
-      [[packages]]
-      name = "nvidia-driver-cuda"
-      version = "580.*"
-
-      [[packages]]
-      name = "nvidia-persistenced"
-      version = "*"
-
-      [[packages]]
-      name = "nvidia-fabric-manager"
-      version = "*"
-
-      [[packages]]
-      name = "libnvidia-nscq-580"
-      version = "*"
-
-      [[packages]]
-      name = "nvidia-container-toolkit"
-      version = "*"
-
-      [[packages]]
-      name = "container-selinux"
-      version = "*"
-
-   .. note::
-      * Replace ``580`` with your target driver version if different (e.g., ``570``, etc.)
-      * **Important**: The ``libnvidia-nscq-550`` package is no longer available in the NVIDIA repository. Use ``libnvidia-nscq-570`` or ``libnvidia-nscq-580`` instead, matching your driver version.
-      * The ``version = "*"`` allows Image Builder to install the latest available version from the repository. Use this for packages that are compatible with any version (e.g., ``nvidia-persistenced``, ``nvidia-fabric-manager``)
-      * The ``version = "580.*"`` pattern matches any patch version of the 580 driver branch. Use this pattern for driver packages to allow patch updates while maintaining the major driver version
-      * For maximum version control, you can specify exact versions (e.g., ``version = "580.54.16"``), but this requires updating the blueprint for each patch release
-      * Use `dnf list available nvidia-driver*` on a reference system with the NVIDIA repository enabled to determine exact package names and versions for your target driver version
-      * For open GPU drivers (tech preview), you must add the NVIDIA CUDA preview repository to Image Builder. Open GPU drivers use different package naming and are currently in tech preview. Check the repository for available package names and versions.
-
-#. Add MicroShift packages to your blueprint. Here is a complete blueprint example that includes MicroShift and all NVIDIA components:
+Create a single blueprint file that includes all required components. Since blueprints do not support modules, you must specify NVIDIA driver packages directly by package name and version:
 
    .. code-block:: toml
 
@@ -1789,7 +1778,9 @@ When composing your RHEL for Edge image with Image Builder, include the NVIDIA d
       groups = []
       distro = "rhel-96"
 
-      # MicroShift packages
+      # ============================================================================
+      # MicroShift Packages (Required)
+      # ============================================================================
       [[packages]]
       name = "microshift"
       version = "*"
@@ -1806,7 +1797,10 @@ When composing your RHEL for Edge image with Image Builder, include the NVIDIA d
       name = "microshift-selinux"
       version = "*"
 
-      # NVIDIA driver packages
+      # ============================================================================
+      # NVIDIA Driver Packages (Required)
+      # Replace "580" with your target driver version if different
+      # ============================================================================
       [[packages]]
       name = "nvidia-driver"
       version = "580.*"
@@ -1819,15 +1813,18 @@ When composing your RHEL for Edge image with Image Builder, include the NVIDIA d
       name = "nvidia-persistenced"
       version = "*"
 
-      [[packages]]
-      name = "nvidia-fabric-manager"
-      version = "*"
+      # Optional: Fabric Manager and NSCQ support
+      # [[packages]]
+      # name = "nvidia-fabric-manager"
+      # version = "*"
+      #
+      # [[packages]]
+      # name = "libnvidia-nscq-580"
+      # version = "*"
 
-      [[packages]]
-      name = "libnvidia-nscq-580"
-      version = "*"
-
-      # NVIDIA Container Toolkit packages
+      # ============================================================================
+      # NVIDIA Container Toolkit (Required)
+      # ============================================================================
       [[packages]]
       name = "nvidia-container-toolkit"
       version = "*"
@@ -1835,6 +1832,10 @@ When composing your RHEL for Edge image with Image Builder, include the NVIDIA d
       [[packages]]
       name = "container-selinux"
       version = "*"
+
+      # ============================================================================
+      # System Customizations
+      # ============================================================================
 
       # Enable MicroShift service
       [customizations.services]
@@ -1844,7 +1845,7 @@ When composing your RHEL for Edge image with Image Builder, include the NVIDIA d
       [customizations.firewall]
       ports = ["22/tcp", "80/tcp", "443/tcp", "30000-32767/tcp", "30000-32767/udp"]
 
-      # Blacklist nouveau driver
+      # Blacklist nouveau driver (recommended approach: blueprint file customization)
       [[customizations.files]]
       path = "/etc/modprobe.d/nouveau-blacklist.conf"
       mode = "0644"
@@ -1852,130 +1853,58 @@ When composing your RHEL for Edge image with Image Builder, include the NVIDIA d
       group = "root"
       data = "blacklist nouveau\nblacklist lbm-nouveau\n"
 
-      # Reference Ignition configuration for Container Toolkit and Device Plugin setup
+      # Reference configuration for Container Toolkit and Device Plugin setup
+      # Option 1: Fetch config from URL at first boot (recommended for most deployments)
+      # Available for both edge-simplified-installer and edge-raw-image
       [customizations.ignition.firstboot]
       url = "http://<HTTP server>/nvidia-setup.ign"
+
+      # Option 2: Embed configuration directly in the image (for disconnected deployments)
+      # Only available for edge-simplified-installer images, not edge-raw-image
+      # Requires base64-encoded configuration
+      # [customizations.ignition.embedded]
+      # config = "<base64-encoded-ignition-config>"
 
    .. note::
       * Replace ``rhel-96`` with your target RHEL minor version (e.g., ``rhel-94``, ``rhel-92``)
       * Replace ``580`` with your target driver version if different
-      * Replace ``<HTTP server>`` with the URL of your HTTP server hosting the Ignition configuration file
+      * Replace ``<HTTP server>`` with the URL of your HTTP server hosting the configuration file
+      * The ``version = "*"`` allows Image Builder to install the latest available version from the repository. Use this for packages that are compatible with any version (e.g., ``nvidia-persistenced``)
+      * The ``version = "580.*"`` pattern matches any patch version of the 580 driver branch. Use this pattern for driver packages to allow patch updates while maintaining the major driver version
+      * For maximum version control, you can specify exact versions (e.g., ``version = "580.54.16"``), but this requires updating the blueprint for each patch release
+      * **Important**: The ``libnvidia-nscq-550`` package is no longer available in the NVIDIA repository. Use ``libnvidia-nscq-570`` or ``libnvidia-nscq-580`` instead, matching your driver version
       * The blueprint includes all required MicroShift packages. For MicroShift 4.20, ensure your Image Builder has access to the ``rhocp-4.20-for-rhel-9-$(uname -m)-rpms`` and ``fast-datapath-for-rhel-9-$(uname -m)-rpms`` repositories
-      * For complete MicroShift blueprint examples, see the MicroShift installation documentation
-
-#. Configure the nouveau driver blacklist. You can use one of the following methods:
-
-   **Option A: Using Blueprint File Customizations (Recommended for simple files)**
-
-   Add the modprobe configuration directly in your blueprint:
-
-   .. code-block:: toml
-
-      [[customizations.files]]
-      path = "/etc/modprobe.d/nouveau-blacklist.conf"
-      mode = "0644"
-      user = "root"
-      group = "root"
-      data = "blacklist nouveau\nblacklist lbm-nouveau\n"
-
-   **Option B: Using Kernel Parameters (Simplest for module blacklisting)**
-
-   Add kernel parameters to your blueprint:
-
-   .. code-block:: toml
-
-      [customizations.kernel]
-      append = "modprobe.blacklist=nouveau"
-
-   **Option C: Using Ignition Configuration (Recommended for complex multi-file configurations)**
-
-   Include the modprobe configuration in your Ignition configuration file:
-
-   .. code-block:: yaml
-
-      variant: r4e
-      version: 1.1.0
-      storage:
-        files:
-          - path: /etc/modprobe.d/nouveau-blacklist.conf
-            mode: 0644
-            contents:
-              inline: |
-                blacklist nouveau
-                blacklist lbm-nouveau
-
-   Then reference the Ignition configuration in your blueprint:
-
-   .. code-block:: toml
-
-      [customizations.ignition.firstboot]
-      url = "http://<HTTP server>/nvidia-config.ign"
-
-   Or embed it directly:
-
-   .. code-block:: toml
-
-      [customizations.ignition.embedded]
-      config = "<base64-encoded-ignition-config>"
+      * For open GPU drivers (tech preview), you must add the NVIDIA CUDA preview repository to Image Builder. Open GPU drivers use different package naming and are currently in tech preview. Check the repository for available package names and versions
 
    .. note::
-      * **Blueprint file customizations** are ideal for simple configuration files that need to be part of the immutable image
-      * **Kernel parameters** are the simplest method for module blacklisting but provide less flexibility
-      * **Ignition** is best for complex configurations involving multiple files, systemd units, users, or when you need dynamic configuration fetched at first boot
-      * For more information on Ignition configuration, see `Using the Ignition tool for the RHEL for Edge Simplified Installer images <https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/assembly_using-the-ignition-tool-for-the-rhel-for-edge-simplified-installer-images_composing-installing-managing-rhel-for-edge-images>`_
-      * For more information on blueprint customizations, see `Supported image customizations <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/composing-rhel-for-edge-images_composing-installing-managing-rhel-for-edge-images#supported-image-customizations_composing-rhel-for-edge-images>`_
-
-**Step 2: Configuring NVIDIA Container Toolkit**
-
-The NVIDIA Container Toolkit package is included in the blueprint, but it requires additional configuration to work with CRI-O. For RHEL for Edge systems, this configuration must be done via Ignition or blueprint customizations, as the system is immutable and cannot be modified after deployment.
-
-#. Create an Ignition configuration file that configures the NVIDIA Container Toolkit. This configuration should include:
-
-   * Setting the SELinux boolean ``container_use_devices``
-   * Configuring CRI-O to use the NVIDIA runtime
-   * Renaming MicroShift configuration files to ensure proper load order (for MicroShift 4.14 and 4.15)
-   * Updating the runtime order in the NVIDIA Container Runtime configuration
-   * Restarting CRI-O
-
-   For a complete example, see the `azure-ignition.bu_.txt` file in the reference documentation, which includes a systemd service that performs all these configurations at first boot.
-
-   .. note::
-      The Container Toolkit configuration can be done via:
+      **Alternative Approaches for Nouveau Blacklist:**
       
-      * **Ignition configuration** (recommended for complex configurations): Use a systemd service that runs at first boot to configure CRI-O and set SELinux booleans
-      * **Blueprint customizations**: Use systemd unit customizations for simpler configurations, though this has limitations for multi-line configurations
+      * **Kernel parameters**: Use ``[customizations.kernel]`` with ``append = "modprobe.blacklist=nouveau"`` if you prefer kernel-level blacklisting
+      * **Via configuration file**: Include the modprobe configuration in your configuration file if you need dynamic setup or complex multi-file configurations
       
-      For MicroShift 4.20+, the MicroShift configuration file is already named ``10-microshift.conf``, ensuring it loads before ``99-nvidia.conf``. For MicroShift 4.14 and 4.15, you must include commands to rename the MicroShift configuration files.
+      For most deployments, blueprint file customization (shown above) is the simplest approach.
 
-#. Reference the Ignition configuration in your blueprint:
+**Step 2.2: Push Blueprint to Image Builder**
 
-   .. code-block:: toml
+.. code-block:: console
 
-      [customizations.ignition.firstboot]
-      url = "http://<HTTP server>/nvidia-container-toolkit.ign"
+   $ sudo composer-cli blueprints push rhel-9.6-microshift-4.20-edge-nvidia.toml
 
-   Or use blueprint customizations for simpler configurations:
+**Phase 3: Runtime Configuration**
 
-   .. code-block:: toml
+The NVIDIA Container Toolkit package is included in the blueprint, but it requires additional configuration to work with CRI-O. For RHEL for Edge systems, this must be done via a configuration file, as the system is immutable and cannot be modified after deployment. The Device Plugin is also installed via this method.
 
-      [[customizations.systemd]]
-      name = "nvidia-container-toolkit-setup.service"
-      enabled = true
-      contents = "[Unit]\nDescription=Configure NVIDIA Container Toolkit\nAfter=crio.service\n[Service]\nType=oneshot\nExecStart=/usr/bin/setsebool -P container_use_devices on\nExecStart=/usr/bin/nvidia-ctk runtime configure --runtime=crio --set-as-default --drop-in-config=/etc/crio/crio.conf.d/99-nvidia.conf\nExecStart=/usr/bin/systemctl restart crio"
+**Step 3.1: Create Unified Configuration**
 
-**Step 3: Embedding NVIDIA Device Plugin**
+Create a single configuration file that handles both Container Toolkit setup and Device Plugin installation:
 
-For RHEL for Edge deployments, you can embed the device plugin using either Helm charts (recommended for production) or static manifests. Both methods are supported, with Helm charts being NVIDIA's preferred method for production deployments.
+The unified configuration includes scripts for Container Toolkit setup and Device Plugin installation. You can choose between Helm-based installation (recommended) or static manifests (alternative).
 
-**Method 1: Installing with Helm Charts (Recommended for Production)**
+**Method 1: Using Helm Charts (Recommended for Production)**
 
 The Helm chart installation method is NVIDIA's recommended approach for production deployments. It provides better configuration flexibility, easier updates, and support for advanced features like time-slicing.
 
-For RHEL for Edge systems, you can install Helm and deploy the device plugin using Helm charts by embedding Helm in the image.
-
-**Option A: Embedding Helm in the Image (Recommended for Immutable Systems)**
-
-#. Create an Ignition configuration file that downloads and installs Helm, then installs the device plugin using Helm at first boot:
+Create a configuration file that handles both Container Toolkit setup and Device Plugin installation via Helm:
 
    .. code-block:: yaml
 
@@ -1983,26 +1912,46 @@ For RHEL for Edge systems, you can install Helm and deploy the device plugin usi
       version: 1.1.0
       storage:
         files:
-          # Container Toolkit configuration script
+          # ========================================================================
+          # Container Toolkit Configuration Script
+          # This script configures CRI-O to use the NVIDIA runtime
+          # ========================================================================
           - path: /usr/local/bin/nvidia-container-toolkit-setup.sh
             mode: 0755
             overwrite: true
             contents:
               inline: |
                 #!/bin/bash
+                set -e
+                
+                # Set SELinux boolean for container device access
                 setsebool -P container_use_devices on
+                
+                # Create CRI-O drop-in configuration directory
                 mkdir -p /etc/crio/crio.conf.d
+                
+                # Configure NVIDIA runtime for CRI-O
                 nvidia-ctk runtime configure --runtime=crio --set-as-default \
                     --drop-in-config=/etc/crio/crio.conf.d/99-nvidia.conf
+                
+                # For MicroShift 4.14 and 4.15, rename configuration files to ensure proper load order
+                # For MicroShift 4.20+, the files are already named correctly
                 if [ -f /etc/crio/crio.conf.d/microshift.conf ] && [ ! -f /etc/crio/crio.conf.d/10-microshift.conf ]; then
                   mv /etc/crio/crio.conf.d/microshift.conf /etc/crio/crio.conf.d/10-microshift.conf
                 fi
                 if [ -f /etc/crio/crio.conf.d/microshift-ovn.conf ] && [ ! -f /etc/crio/crio.conf.d/11-microshift-ovn.conf ]; then
                   mv /etc/crio/crio.conf.d/microshift-ovn.conf /etc/crio/crio.conf.d/11-microshift-ovn.conf
                 fi
+                
+                # Update runtime order in NVIDIA Container Runtime configuration to prioritize crun
                 sed -i 's/^runtimes =.*$/runtimes = ["crun", "docker-runc", "runc"]/g' /etc/nvidia-container-runtime/config.toml || true
+                
+                # Restart CRI-O to apply configuration
                 systemctl restart crio
-          # Helm installation script (downloads and installs Helm)
+
+          # ========================================================================
+          # Helm Installation Script (for Helm-based Device Plugin deployment)
+          # ========================================================================
           - path: /usr/local/bin/install-helm.sh
             mode: 0755
             overwrite: true
@@ -2019,7 +1968,10 @@ For RHEL for Edge systems, you can install Helm and deploy the device plugin usi
                 chmod +x /usr/local/bin/helm
                 rm -rf ${ARCH} "helm-${HELM_VERSION}-${ARCH}.tar.gz"
                 helm version
-          # Helm installation script for Device Plugin
+
+          # ========================================================================
+          # Device Plugin Installation Script (Helm Method - Recommended)
+          # ========================================================================
           - path: /usr/local/bin/nvidia-device-plugin-helm-install.sh
             mode: 0755
             overwrite: true
@@ -2028,13 +1980,20 @@ For RHEL for Edge systems, you can install Helm and deploy the device plugin usi
                 #!/bin/bash
                 set -e
                 export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
+                
                 # Ensure Helm is installed
                 if ! command -v helm &> /dev/null; then
                   /usr/local/bin/install-helm.sh
                 fi
+                
+                # Add NVIDIA Device Plugin Helm repository
                 helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
                 helm repo update
+                
+                # Create namespace
                 oc create namespace nvidia-device-plugin --dry-run=client -o yaml | oc apply -f -
+                
+                # Configure Pod Security Standards
                 oc label namespace nvidia-device-plugin \
                     pod-security.kubernetes.io/enforce=privileged \
                     pod-security.kubernetes.io/enforce-version=latest \
@@ -2042,25 +2001,19 @@ For RHEL for Edge systems, you can install Helm and deploy the device plugin usi
                     pod-security.kubernetes.io/warn-version=latest \
                     pod-security.kubernetes.io/audit=privileged \
                     pod-security.kubernetes.io/audit-version=latest --overwrite
+                
+                # Grant Security Context Constraint permissions
                 oc adm policy add-scc-to-user privileged -z default -n nvidia-device-plugin
+                
+                # Install Device Plugin using Helm
                 helm upgrade -i nvdp nvdp/nvidia-device-plugin -n nvidia-device-plugin --version 0.18.0 \
                     --set securityContext.privileged=true \
                     --set gfd.enabled=true \
                     --set gfd.securityContext.privileged=true
+
       systemd:
         units:
-          - name: install-helm.service
-            enabled: true
-            contents: |
-              [Unit]
-              Description=Install Helm binary
-              Before=nvidia-device-plugin-helm-install.service
-              [Service]
-              Type=oneshot
-              RemainAfterExit=yes
-              ExecStart=/usr/local/bin/install-helm.sh
-              [Install]
-              WantedBy=multi-user.target
+          # Container Toolkit setup service
           - name: nvidia-container-toolkit-setup.service
             enabled: true
             contents: |
@@ -2074,6 +2027,22 @@ For RHEL for Edge systems, you can install Helm and deploy the device plugin usi
               ExecStart=/usr/local/bin/nvidia-container-toolkit-setup.sh
               [Install]
               WantedBy=multi-user.target
+
+          # Helm installation service (only needed for Helm-based Device Plugin)
+          - name: install-helm.service
+            enabled: true
+            contents: |
+              [Unit]
+              Description=Install Helm binary
+              Before=nvidia-device-plugin-helm-install.service
+              [Service]
+              Type=oneshot
+              RemainAfterExit=yes
+              ExecStart=/usr/local/bin/install-helm.sh
+              [Install]
+              WantedBy=multi-user.target
+
+          # Device Plugin installation service (Helm method - recommended)
           - name: nvidia-device-plugin-helm-install.service
             enabled: true
             contents: |
@@ -2090,41 +2059,24 @@ For RHEL for Edge systems, you can install Helm and deploy the device plugin usi
 
    .. note::
       * The Helm chart installation on MicroShift requires manual Security Context Constraint (SCC) configuration. The script above includes the necessary SCC permissions. For more advanced configurations like time-slicing, you can create ConfigMap files in the Ignition configuration and reference them in the Helm install command.
-      * **Helm Installation Method**: The Ignition configuration above installs Helm at first boot by downloading the binary from the official Helm releases. This approach ensures Helm is part of the immutable base image without requiring package layering on a running system. The Helm binary is installed to `/usr/local/bin/helm` and will be available for the device plugin installation service.
-      * **Alternative**: If you prefer to include Helm directly in the blueprint (rather than downloading at first boot), you can use blueprint file customizations to download and place the Helm binary during image composition. However, the Ignition approach is recommended as it keeps the image composition simpler and ensures Helm is always up-to-date at first boot.
+      * **Helm Installation Method**: The configuration above installs Helm at first boot by downloading the binary from the official Helm releases. This approach ensures Helm is part of the immutable base image without requiring package layering on a running system. The Helm binary is installed to `/usr/local/bin/helm` and will be available for the device plugin installation service.
 
-**Method 2: Installing with Static Manifests (Alternative)**
+**Method 2: Using Static Manifests (Alternative)**
 
 The static manifest method deploys the device plugin using YAML files placed in MicroShift's manifests directory. This method is available as an alternative to Helm charts for simpler deployments that don't require advanced configuration features.
 
-#. Create an Ignition configuration file (e.g., ``nvidia-device-plugin.ign``) that includes the device plugin manifests and Container Toolkit configuration:
+To use static manifests, modify the unified configuration above:
+
+1. Remove or comment out the Helm-related files and services (``install-helm.sh``, ``nvidia-device-plugin-helm-install.sh``, ``install-helm.service``, ``nvidia-device-plugin-helm-install.service``)
+2. Add the Device Plugin manifest files:
 
    .. code-block:: yaml
 
-      variant: r4e
-      version: 1.1.0
       storage:
         files:
-          # Container Toolkit configuration script
-          - path: /usr/local/bin/nvidia-container-toolkit-setup.sh
-            mode: 0755
-            overwrite: true
-            contents:
-              inline: |
-                #!/bin/bash
-                setsebool -P container_use_devices on
-                mkdir -p /etc/crio/crio.conf.d
-                nvidia-ctk runtime configure --runtime=crio --set-as-default \
-                    --drop-in-config=/etc/crio/crio.conf.d/99-nvidia.conf
-                if [ -f /etc/crio/crio.conf.d/microshift.conf ] && [ ! -f /etc/crio/crio.conf.d/10-microshift.conf ]; then
-                  mv /etc/crio/crio.conf.d/microshift.conf /etc/crio/crio.conf.d/10-microshift.conf
-                fi
-                if [ -f /etc/crio/crio.conf.d/microshift-ovn.conf ] && [ ! -f /etc/crio/crio.conf.d/11-microshift-ovn.conf ]; then
-                  mv /etc/crio/crio.conf.d/microshift-ovn.conf /etc/crio/crio.conf.d/11-microshift-ovn.conf
-                fi
-                sed -i 's/^runtimes =.*$/runtimes = ["crun", "docker-runc", "runc"]/g' /etc/nvidia-container-runtime/config.toml || true
-                systemctl restart crio
-          # Device Plugin manifests
+          # ... (keep Container Toolkit setup script) ...
+          
+          # Device Plugin static manifests
           - path: /etc/microshift/manifests.d/nvidia-device-plugin/nvidia-device-plugin.yml
             mode: 0640
             overwrite: true
@@ -2139,28 +2091,31 @@ The static manifest method deploys the device plugin using YAML files placed in 
                 kind: Kustomization
                 resources:
                   - nvidia-device-plugin.yml
+
       systemd:
         units:
-          - name: nvidia-container-toolkit-setup.service
-            enabled: true
-            contents: |
-              [Unit]
-              Description=Configure NVIDIA Container Toolkit for CRI-O
-              After=crio.service microshift.service
-              Requires=crio.service
-              [Service]
-              Type=oneshot
-              RemainAfterExit=yes
-              ExecStart=/usr/local/bin/nvidia-container-toolkit-setup.sh
-              [Install]
-              WantedBy=multi-user.target
+          # ... (keep Container Toolkit setup service) ...
+          # No additional services needed for static manifests
 
    .. note::
       For time-slicing or other advanced configurations, you can embed a custom device plugin manifest with ConfigMap. See the example in the `azure-ignition.bu_.txt` file in the reference documentation for a complete time-slicing configuration.
 
-#. Host the Ignition configuration file on an HTTP server accessible during image build and deployment.
+**Step 3.2: Configure in Blueprint**
 
-#. Reference the Ignition configuration in your Image Builder blueprint:
+You have two options for providing the configuration to your RHEL for Edge image:
+
+**Option 1: First Boot URL (Recommended for Most Deployments)**
+
+This method fetches the configuration from a URL during first boot. It is available for both ``edge-simplified-installer`` and ``edge-raw-image`` image types.
+
+#. Host the configuration file on an HTTP server accessible during first boot:
+
+   .. code-block:: console
+
+      $ cp nvidia-setup.ign /var/www/html/
+      $ chmod 644 /var/www/html/nvidia-setup.ign
+
+#. Update your blueprint to reference the URL:
 
    .. code-block:: toml
 
@@ -2168,65 +2123,133 @@ The static manifest method deploys the device plugin using YAML files placed in 
       url = "http://<HTTP server>/nvidia-setup.ign"
 
    .. note::
-      Replace ``<HTTP server>`` with the URL of your HTTP server hosting the Ignition configuration file. For more information on using Ignition with Image Builder, see the `Embedding MicroShift in a RHEL for Edge image guide <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/embedding_in_a_rhel_for_edge_image/index>`_.
+      Replace ``<HTTP server>`` with the hostname or IP address of your HTTP server. The server must be accessible from the target device during first boot.
 
-.. important::
-   For RHEL for Edge systems, use Ignition configuration files to embed custom files. The blueprint file references the Ignition configuration via the ``[customizations.ignition.firstboot]`` section. For more information, see `Creating an Ignition configuration file <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/composing-rhel-for-edge-images_composing-installing-managing-rhel-for-edge-images#creating-an-ignition-configuration-file_composing-rhel-for-edge-images>`_ and `Composing, installing, and managing RHEL for Edge images <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/>`_.
+**Option 2: Embedded Configuration (For Disconnected Deployments)**
 
-**Building and Deploying the Complete Image**
+This method embeds the configuration directly in the image. It is **only available for ``edge-simplified-installer`` images**, not for ``edge-raw-image``. Use this method for fully disconnected deployments where the device cannot access an HTTP server at first boot.
 
-Based on the reference documentation, the workflow for building RHEL for Edge images with NVIDIA support typically involves:
-
-#. Create an OSTree commit using your blueprint with all NVIDIA components:
+#. Convert your configuration file to base64:
 
    .. code-block:: console
 
-      $ composer-cli compose start <blueprint-name> edge-commit
+      $ base64 -w 0 nvidia-setup.ign > nvidia-setup.ign.b64
 
-#. Export the OSTree commit as an HTTP repository (or container repository):
-
-   .. code-block:: console
-
-      $ composer-cli compose image <compose-id>
-      $ tar xf <compose-id>-commit.tar
-      $ ostree summary --repo=repo -u
-
-#. Build the final RHEL for Edge image (e.g., edge-raw-image) that references the OSTree commit:
+   Or on macOS:
 
    .. code-block:: console
 
-      $ composer-cli compose start-ostree <blueprint-name> edge-raw-image --url http://<HTTP server>/ostree/repo
+      $ base64 -i nvidia-setup.ign > nvidia-setup.ign.b64
+
+#. Update your blueprint to embed the base64-encoded configuration:
+
+   .. code-block:: toml
+
+      [customizations.ignition.embedded]
+      config = "<paste-base64-encoded-content-here>"
 
    .. note::
-      For detailed procedures on building different image types (edge-commit, edge-installer, edge-container, edge-raw-image), see `Creating a RHEL for Edge Commit image by using image builder CLI <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/composing-rhel-for-edge-images_composing-installing-managing-rhel-for-edge-images#creating-a-rhel-for-edge-commit-image-by-using-image-builder-cli_composing-rhel-for-edge-images>`_ and related documentation.
+      * The embedded configuration must be a single-line base64-encoded string
+      * This method is only supported for ``edge-simplified-installer`` image types
+      * For ``edge-raw-image``, you must use the ``ignition.firstboot`` URL method
+      * The embedded configuration is included in the image at build time, so updates require rebuilding the image
 
-#. Deploy the RHEL for Edge image to your new device. The procedure depends on your deployment method:
+**Choosing Between Methods**
 
-   **For network-based deployments:**
+* **Use ``ignition.firstboot`` (URL method)** when:
+  
+  * You need to support both ``edge-simplified-installer`` and ``edge-raw-image``
+  * You want to update the configuration without rebuilding the image
+  * Your devices have network access during first boot
+  * You prefer a simpler workflow (no base64 encoding required)
 
-   Follow the procedures in `Deploying a RHEL for Edge image in a network-based environment <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/deploying-rhel-for-edge-images_deploying-rhel-for-edge-images>`_.
+* **Use ``ignition.embedded`` (embedded method)** when:
+  
+  * You are building ``edge-simplified-installer`` images only
+  * Your devices are fully disconnected and cannot access an HTTP server
+  * You need a completely self-contained image with no external dependencies
+  * You want the configuration to be immutable and part of the image
 
-   **For non-network-based deployments:**
+.. important::
+   For RHEL for Edge systems, use configuration files to embed custom files. The blueprint references the configuration via either ``[customizations.ignition.firstboot]`` or ``[customizations.ignition.embedded]``. For more information, see `Creating an Ignition configuration file <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/composing-rhel-for-edge-images_composing-installing-managing-rhel-for-edge-images#creating-an-ignition-configuration-file_composing-rhel-for-edge-images>`_ and `Composing, installing, and managing RHEL for Edge images <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/>`_.
 
-   Follow the procedures in `Installing the RHEL for Edge image for non-network-based deployments <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/deploying-rhel-for-edge-images_deploying-rhel-for-edge-images#installing-the-rhel-for-edge-image-for-non-network-based-deployments_deploying-rhel-for-edge-images>`_.
+**Phase 4: Build and Deploy**
 
-#. After the device boots with the new image, verify all NVIDIA components are installed:
+**Step 4.1: Create OSTree Commit**
 
-   .. code-block:: console
+Create an OSTree commit using your blueprint with all NVIDIA components:
 
-      $ nvidia-smi
+.. code-block:: console
 
-   .. code-block:: console
+   $ sudo composer-cli compose start rhel-9.6-microshift-4.20-edge-nvidia edge-commit
 
-      $ nvidia-ctk --version
+**Step 4.2: Export OSTree Commit**
 
-   .. code-block:: console
+Export the OSTree commit as an HTTP repository (or container repository):
 
-      $ systemctl status crio
+.. code-block:: console
 
-   .. code-block:: console
+   $ sudo composer-cli compose image <compose-id>
+   $ tar xf <compose-id>-commit.tar
+   $ ostree summary --repo=repo -u
 
-      $ oc get pod -n nvidia-device-plugin
+**Step 4.3: Build Final Image**
+
+Build the final RHEL for Edge image (e.g., edge-raw-image) that references the OSTree commit:
+
+.. code-block:: console
+
+   $ sudo composer-cli compose start-ostree \
+       rhel-9.6-microshift-4.20-edge-nvidia \
+       edge-raw-image \
+       --url http://<HTTP server>/ostree/repo
+
+.. note::
+   For detailed procedures on building different image types (edge-commit, edge-installer, edge-container, edge-raw-image), see `Creating a RHEL for Edge Commit image by using image builder CLI <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/composing-rhel-for-edge-images_composing-installing-managing-rhel-for-edge-images#creating-a-rhel-for-edge-commit-image-by-using-image-builder-cli_composing-rhel-for-edge-images>`_ and related documentation.
+
+**Step 4.4: Deploy Image**
+
+Deploy the RHEL for Edge image to your new device. The procedure depends on your deployment method:
+
+**For network-based deployments:**
+
+Follow the procedures in `Deploying a RHEL for Edge image in a network-based environment <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/deploying-rhel-for-edge-images_deploying-rhel-for-edge-images>`_.
+
+**For non-network-based deployments:**
+
+Follow the procedures in `Installing the RHEL for Edge image for non-network-based deployments <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/composing_installing_and_managing_rhel_for_edge_images/deploying-rhel-for-edge-images_deploying-rhel-for-edge-images#installing-the-rhel-for-edge-image-for-non-network-based-deployments_deploying-rhel-for-edge-images>`_.
+
+**Phase 5: Verification**
+
+**Step 5.1: Verify Packages**
+
+After the device boots with the new image, verify that all packages are installed:
+
+.. code-block:: console
+
+   $ rpm -qa | grep -E "(nvidia|microshift)"
+   $ rpm -qa | grep nvidia-driver
+   $ rpm -qa | grep nvidia-container-toolkit
+
+**Step 5.2: Verify Driver and Container Toolkit**
+
+Verify the NVIDIA driver and Container Toolkit are working:
+
+.. code-block:: console
+
+   $ nvidia-smi
+   $ nvidia-ctk --version
+   $ systemctl status crio
+   $ cat /etc/crio/crio.conf.d/99-nvidia.conf
+
+**Step 5.3: Verify Device Plugin**
+
+Verify the Device Plugin is running:
+
+.. code-block:: console
+
+   $ oc get pod -n nvidia-device-plugin
+   $ oc get node -o json | jq -r '.items[0].status.capacity | ."nvidia.com/gpu"'
 
 .. note::
    **About Package Layering**: While rpm-ostree (the upstream project that RHEL for Edge is based on) supports layering packages on running systems (documented in `Fedora IoT: Adding Layered Packages <https://docs.fedoraproject.org/en-US/iot/add-layered/>`_ and `rpm-ostree Layering Documentation <https://coreos.github.io/rpm-ostree/layering/>`_), this approach is **not documented or recommended by Red Hat** for NVIDIA drivers on RHEL for Edge systems. The official Red Hat documentation for MicroShift on RHEL for Edge systems (`Updating RPMs on a RHEL for Edge system <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.20/html/updating/microshift-update-rpms-ostree>`_) and the Red Hat Knowledgebase article for NVIDIA drivers only document the blueprint-based image composition approach. Layering packages breaks the immutable nature of RHEL for Edge systems and is not supported for production deployments. Always use the blueprint-based approach documented above.
@@ -2237,7 +2260,7 @@ Based on the reference documentation, the workflow for building RHEL for Edge im
 .. _verifying-gpu-workloads:
 
 ********************************
-Verifying GPU Workloads
+Verifying GPU workloads
 ********************************
 
 You can run a test workload to verify that the configuration is correct. A simple workload is the CUDA vectorAdd program that NVIDIA provides in a container image.
@@ -2316,24 +2339,24 @@ You can run a test workload to verify that the configuration is correct. A simpl
 .. _supportability-compatibility:
 
 **************************************
-Supportability and Compatibility
+Supportability and compatibility
 **************************************
 
 **In this section**: This section covers support policies from NVIDIA and Red Hat, version compatibility requirements, driver lifecycle information, and additional resources for troubleshooting and further information.
 
-**NVIDIA Support**
+**NVIDIA support**
 
 The NVIDIA Device Plugin, Container Toolkit, and GPU drivers are supported by NVIDIA through their Enterprise Support program. For production deployments, ensure you have an active NVIDIA Enterprise Support agreement.
 
-**Red Hat Support**
+**Red Hat support**
 
 Red Hat supports the integration of NVIDIA components with Red Hat Device Edge and MicroShift within the scope of `Red Hat's third-party software support policies <https://access.redhat.com/articles/third-party-software-support>`_. For issues related to NVIDIA components (drivers, container toolkit, device plugin), contact NVIDIA Enterprise Support. For Red Hat components (MicroShift, RHEL, CRI-O), contact Red Hat Support. For integration issues, Red Hat and NVIDIA can collaborate through `TSANet <https://www.tsanet.org/>`_ when both support agreements are active.
 
-**Driver Lifecycle**
+**Driver lifecycle**
 
 Always use supported Production Branch driver versions. End-of-Life (EOL) driver branches should not be used in production. Refer to `NVIDIA's driver support matrix <https://docs.nvidia.com/datacenter/tesla/drivers/supported-drivers-and-cuda-toolkit-versions.html>`_ for current supported versions.
 
-**Version Compatibility**
+**Version compatibility**
 
 Ensure compatibility between:
 
@@ -2345,9 +2368,9 @@ Ensure compatibility between:
 
 Refer to the respective component documentation for compatibility matrices.
 
-**Additional Resources**
+**Additional resources**
 
-**Red Hat Documentation**
+**Red Hat documentation**
 
 * `Red Hat Device Edge Overview <https://docs.redhat.com/en/documentation/red_hat_device_edge/4/html/overview/device-edge-overview>`_
 * `Red Hat Build of MicroShift Documentation <https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest>`_
@@ -2358,7 +2381,7 @@ Refer to the respective component documentation for compatibility matrices.
 * `Using image mode for RHEL to build, deploy, and manage operating systems <https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/using_image_mode_for_rhel_to_build_deploy_and_manage_operating_systems/>`_
 * `Creating bootc-compatible base disk images by using bootc-image-builder <https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/using_image_mode_for_rhel_to_build_deploy_and_manage_operating_systems/creating-bootc-compatible-base-disk-images-with-bootc-image-builder_using-image-mode-for-rhel-to-build-deploy-and-manage-operating-systems>`_
 
-**Red Hat Support and Knowledge Base**
+**Red Hat support and knowledge base**
 
 * `Red Hat Device Edge Support Policy <https://access.redhat.com/support/policy/updates/rhde>`_
 * `Red Hat Product Life Cycles <https://access.redhat.com/product-life-cycles?product=Red%20Hat%20Device%20Edge,Red%20Hat%20build%20of%20Microshift>`_
@@ -2370,7 +2393,7 @@ Refer to the respective component documentation for compatibility matrices.
 * `How to use Extra Packages for Enterprise Linux (EPEL) <https://access.redhat.com/solutions/3358>`_
 * `Is DKMS provided in Red Hat Enterprise Linux? <https://access.redhat.com/solutions/1132653>`_
 
-**NVIDIA Documentation and Resources**
+**NVIDIA documentation and resources**
 
 * `NVIDIA Device Plugin GitHub Repository <https://github.com/NVIDIA/k8s-device-plugin>`_
 * `NVIDIA Container Toolkit Documentation <https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/overview.html>`_
@@ -2380,11 +2403,11 @@ Refer to the respective component documentation for compatibility matrices.
 * `NVIDIA Open GPU Datacenter Drivers for RHEL9 signed by Red Hat <https://developer.nvidia.com/blog/nvidia-open-gpu-datacenter-drivers-for-rhel9-signed-by-red-hat>`_
 * `Streamlining NVIDIA Driver Deployment on RHEL 8 with Modularity Streams <https://developer.nvidia.com/blog/streamlining-nvidia-driver-deployment-on-rhel-8-with-modularity-streams/>`_
 
-**Upstream Projects**
+**Upstream projects**
 
 * `bootc Getting Started <https://docs.fedoraproject.org/en-US/bootc/getting-started/>`_
 * `rpm-ostree Documentation <https://coreos.github.io/rpm-ostree/>`_
 
-**Support Collaboration**
+**Support collaboration**
 
 * `TSANet <https://www.tsanet.org/>`_
